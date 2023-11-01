@@ -37,16 +37,30 @@ public class lab4 extends instructions {
     public static void spim(ArrayList<Object> write, Hashtable<String, String> reg_codes, Hashtable<String, String> label_addresses) {
         int[] registers = new int[32];
         int[] data_memory = new int[8192];
+        ArrayList<String> pipeline = new ArrayList<>();
+        pipeline.add("empty");
+        pipeline.add("empty");
+        pipeline.add("empty");
+        pipeline.add("empty");
         for (int i = 0; i < data_memory.length; i++) {
             data_memory[i] = 0;
         }
         Scanner scanner = new Scanner(System.in);
 
         final int[] pc = {0};
+        final int[] cycles = {0};
+
 
         Runnable runnable = new Runnable() {
             public void run() {
                 Object curr = write.get(pc[0]);
+                pipeline.add(0, curr.getClass().toString().substring(19).toLowerCase());
+                pipeline.remove(pipeline.size()-1); 
+                cycles[0] += 1;  
+                System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
+                System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0], pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                             
+
                 if (curr.getClass().equals(instructions.And.class)){
                     And obj = (And) curr;
                     int rs = Integer.parseInt(obj.rs, 2);
@@ -202,6 +216,9 @@ public class lab4 extends instructions {
                 while (pc[0] < write.size()) {
                     runnable.run();
                 }
+                System.out.println("Program complete");
+                System.out.format("CPI = %.3f     Cycles = %d      Instructions = %d\n", (double) cycles[0] / write.size(), cycles[0], write.size());
+                break;
             }
             
             else if (input.charAt(0) == 'c'){
@@ -609,7 +626,7 @@ public class lab4 extends instructions {
                 System.out.println("invalid instruction: " + split[0]);
                 break;
             }
-            System.out.println();
+            // System.out.println();
             pc += 1;
         }
         return instructions;
