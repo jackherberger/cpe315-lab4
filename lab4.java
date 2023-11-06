@@ -49,7 +49,7 @@ public class lab4 extends instructions {
 
         final int[] pc = {0};
         final int[] cycles = {0};
-
+        final int[] flag = {0};
 
         Runnable runnable = new Runnable() {
             public void run() {
@@ -143,9 +143,12 @@ public class lab4 extends instructions {
                     }
                 }
                 else if (curr.getClass().equals(instructions.Lw.class)){
+                    Object next = write.get(pc[0] + 1);
+                    instruction next_obj = (instruction) next;
                     Lw obj = (Lw) curr;
                     int rs = Integer.parseInt(obj.rs, 2);
                     int rt = Integer.parseInt(obj.rt, 2);
+
                     int offset = Integer.parseInt(obj.offset, 2);
                     registers[rt] = data_memory[registers[rs]+offset];
                 }
@@ -732,4 +735,3 @@ public class lab4 extends instructions {
 // J Type - j, jal
 
 }
- 
