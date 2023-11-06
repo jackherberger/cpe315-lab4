@@ -284,6 +284,7 @@ public class instructions {
         
         public Sw(String rt, String offset, String rs) {
             super();
+            
             this.opcode = "101011";
             this.rs = rs;
             this.rt = rt;
