@@ -151,22 +151,32 @@ public class lab4 extends instructions {
                     // R type - and, or, add, sll, sub, slt, jr - no need to check rd
                     // I Type - addi, beq, bne, lw, sw, 
                     // J Type - j, jal
+                    if (next_obj.type == "r") {
+                        if (next_obj.rs != null) {
+                            int next_rs = Integer.parseInt(next_obj.rs, 2);
+                            if (rs == next_rs) {
+                                //SET FLAG 
+                            }
+                        }
+                        if (next_obj.rt != null) {
+                            int next_rt = Integer.parseInt(next_obj.rt, 2);
+                            if (rs == next_rt) {
+                                //SET FLAG 
+                            }
+                        }
+                    }
 
-                    if (next_obj.rs != null) {
-                        int next_rs = Integer.parseInt(next_obj.rs, 2);
-                        if (rs == next_rs) {
-                            // SET FLAG
+                    if (next_obj.type == "i") {
+                        if (next_obj.rs != null) {
+                            int next_rs = Integer.parseInt(next_obj.rs, 2);
+                            if (rs == next_rs) {
+                                //SET FLAG 
+                            }
                         }
                     }
-                    if (next_obj.rt != null) {
-                        int next_rt = Integer.parseInt(next_obj.rt, 2);
-                        if (rs == next_rt) {
-                            // SET FLAG
-                        }
-                    }
-                    if (next_obj.rd != null) {
-                        int next_rd = Integer.parseInt(next_obj.rd, 2);
-                        if (rs == next_rd) {
+
+                    if (curr.getClass().equals(instructions.Jal.class)){
+                        if (rs == 0b11111) {
                             // SET FLAG
                         }
                     }

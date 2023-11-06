@@ -4,11 +4,13 @@ public class instructions {
         public String rs;
         public String rt;
         public String rd;
+        public String type;
 
         public instruction() {
             this.rs = null;
             this.rt = null;
             this.rd = null;
+            this.type = null;
         }
     }
 
@@ -25,6 +27,7 @@ public class instructions {
             this.rt = rt;
             this.funct = "100100";
             this.shampt = "00000";
+            this.type = "r";
         }
 
         public void printObj() {
@@ -50,6 +53,7 @@ public class instructions {
             this.rt = rt;
             this.funct = "100101";
             this.shampt = "00000";
+            this.type = "r";
         }
 
         public void printObj() {
@@ -84,6 +88,7 @@ public class instructions {
             System.out.print(this.rd + " ");
             System.out.print(this.shampt + " ");
             System.out.print(this.funct);
+            this.type = "r";
         }
     }
 
@@ -99,6 +104,7 @@ public class instructions {
             this.rt = rt;
             this.sa = sa;
             this.funct = "000000";
+            this.type = "r";
         }
 
         public void printObj() {
@@ -124,6 +130,7 @@ public class instructions {
             this.rt = rt;
             this.funct = "100010";
             this.shampt = "00000";
+            this.type = "r";
         }
 
         public void printObj() {
@@ -149,6 +156,7 @@ public class instructions {
             this.rt = rt;
             this.funct = "101010";
             this.shampt = "00000";
+            this.type = "r";
         }
 
         public void printObj() {
@@ -170,6 +178,7 @@ public class instructions {
             this.opcode = "000000";
             this.rs = rs;
             this.funct = "001000";
+            this.type = "r";
         }
 
         public void printObj() {
@@ -190,6 +199,7 @@ public class instructions {
             this.rs = rs;
             this.rt = rt;
             this.imm = imm;
+            this.type = "i";
         }
 
         public void printObj() {
@@ -211,6 +221,7 @@ public class instructions {
             this.rs = rs;
             this.rt = rt;
             this.offset = offset;
+            this.type = "i";
         }
 
         public void printObj() {
@@ -232,6 +243,7 @@ public class instructions {
             this.rs = rs;
             this.rt = rt;
             this.offset = offset;
+            this.type = "i";
         }
 
         public void printObj() {
@@ -253,6 +265,7 @@ public class instructions {
             this.rs = rs;
             this.rt = rt;
             this.offset = offset;
+            this.type = "i";
         }
 
         public void printObj() {
@@ -263,17 +276,20 @@ public class instructions {
         }
     }
     
-    public static class Sw {
+    public static class Sw extends instruction {
         public String opcode;
         public String rs;
         public String rt;
         public String offset;
         
         public Sw(String rt, String offset, String rs) {
+            super();
+            
             this.opcode = "101011";
             this.rs = rs;
             this.rt = rt;
             this.offset = offset;
+            this.type = "i";
         }
 
         public void printObj() {
@@ -284,13 +300,15 @@ public class instructions {
         }
     }
 
-    public static class J {
+    public static class J extends instruction {
         public String opcode;
         public String target;
         
         public J(String target) {
+            super();
             this.opcode = "000010";
             this.target = target;
+            this.type = "j";
         }
 
         public void printObj() {
@@ -299,13 +317,15 @@ public class instructions {
         }
     }
 
-    public static class Jal {
+    public static class Jal extends instruction {
         public String opcode;
         public String target;
         
         public Jal(String target) {
+            super();
             this.opcode = "000011";
             this.target = target;
+            this.type = "j";
         }
         public void printObj() {
             System.out.print(this.opcode + " ");
