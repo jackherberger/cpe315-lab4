@@ -143,9 +143,33 @@ public class lab4 extends instructions {
                     }
                 }
                 else if (curr.getClass().equals(instructions.Lw.class)){
+                    Object next = write.get(pc[0] + 1);
+                    instruction next_obj = (instruction) next;
                     Lw obj = (Lw) curr;
                     int rs = Integer.parseInt(obj.rs, 2);
                     int rt = Integer.parseInt(obj.rt, 2);
+                    // R type - and, or, add, sll, sub, slt, jr - no need to check rd
+                    // I Type - addi, beq, bne, lw, sw, 
+                    // J Type - j, jal
+
+                    if (next_obj.rs != null) {
+                        int next_rs = Integer.parseInt(next_obj.rs, 2);
+                        if (rs == next_rs) {
+                            // SET FLAG
+                        }
+                    }
+                    if (next_obj.rt != null) {
+                        int next_rt = Integer.parseInt(next_obj.rt, 2);
+                        if (rs == next_rt) {
+                            // SET FLAG
+                        }
+                    }
+                    if (next_obj.rd != null) {
+                        int next_rd = Integer.parseInt(next_obj.rd, 2);
+                        if (rs == next_rd) {
+                            // SET FLAG
+                        }
+                    }
                     int offset = Integer.parseInt(obj.offset, 2);
                     registers[rt] = data_memory[registers[rs]+offset];
                 }
