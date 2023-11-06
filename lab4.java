@@ -49,10 +49,12 @@ public class lab4 extends instructions {
 
         final int[] pc = {0};
         final int[] cycles = {0};
+        final int[] lw_flag = {0};
 
 
         Runnable runnable = new Runnable() {
             public void run() {
+                
                 Object curr = write.get(pc[0]);
                 pipeline.add(0, curr.getClass().toString().substring(19).toLowerCase());
                 pipeline.remove(pipeline.size()-1); 
@@ -60,7 +62,16 @@ public class lab4 extends instructions {
                 System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
                 System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0], pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
                              
-
+                if (lw_flag[0] != 0){
+                    while (lw_flag[0] != 0) {
+                        System.out.println("Here!");
+                        pipeline.add(0, "stall");
+                        pipeline.remove(pipeline.size()-1); 
+                        cycles[0] += 1;
+                        lw_flag[0] -= 1;
+                    }
+                    return;
+                }
                 if (curr.getClass().equals(instructions.And.class)){
                     And obj = (And) curr;
                     int rs = Integer.parseInt(obj.rs, 2);
@@ -151,33 +162,39 @@ public class lab4 extends instructions {
                     // R type - and, or, add, sll, sub, slt, jr - no need to check rd
                     // I Type - addi, beq, bne, lw, sw, 
                     // J Type - j, jal
-                    if (next_obj.type == "r") {
-                        if (next_obj.rs != null) {
-                            int next_rs = Integer.parseInt(next_obj.rs, 2);
-                            if (rs == next_rs) {
-                                //SET FLAG 
+                    System.out.println(next_obj.type);
+                    if (next_obj.type != '\0') { 
+                        
+                        if (next_obj.type == 'r') {
+                            if (next_obj.rs != null) {
+                                int next_rs = Integer.parseInt(next_obj.rs, 2);
+                                if (rs == next_rs) {
+                                    lw_flag[0] = 1; 
+                                }
                             }
-                        }
-                        if (next_obj.rt != null) {
-                            int next_rt = Integer.parseInt(next_obj.rt, 2);
-                            if (rs == next_rt) {
-                                //SET FLAG 
-                            }
-                        }
-                    }
-
-                    if (next_obj.type == "i") {
-                        if (next_obj.rs != null) {
-                            int next_rs = Integer.parseInt(next_obj.rs, 2);
-                            if (rs == next_rs) {
-                                //SET FLAG 
+                            if (next_obj.rt != null) {
+                                int next_rt = Integer.parseInt(next_obj.rt, 2);
+                                if (rs == next_rt) {
+                                    lw_flag[0] = 1; 
+                                }
                             }
                         }
                     }
 
+                    if (next_obj.type != '\0') {
+                        if (next_obj.type == 'i') {
+                            if (next_obj.rs != null) {
+                                int next_rs = Integer.parseInt(next_obj.rs, 2);
+                                if (rs == next_rs) {
+                                    lw_flag[0] = 1; 
+                                }
+                            }
+                        }
+                    }
+                    
                     if (curr.getClass().equals(instructions.Jal.class)){
                         if (rs == 0b11111) {
-                            // SET FLAG
+                            lw_flag[0] = 1; 
                         }
                     }
                     int offset = Integer.parseInt(obj.offset, 2);
