@@ -4,13 +4,13 @@ public class instructions {
         public String rs;
         public String rt;
         public String rd;
-        public String type;
+        public char type;
 
         public instruction() {
             this.rs = null;
             this.rt = null;
             this.rd = null;
-            this.type = null;
+            this.type = '\0';
         }
     }
 
@@ -27,7 +27,7 @@ public class instructions {
             this.rt = rt;
             this.funct = "100100";
             this.shampt = "00000";
-            this.type = "r";
+            this.type = 'r';
         }
 
         public void printObj() {
@@ -53,7 +53,7 @@ public class instructions {
             this.rt = rt;
             this.funct = "100101";
             this.shampt = "00000";
-            this.type = "r";
+            this.type = 'r';
         }
 
         public void printObj() {
@@ -79,6 +79,7 @@ public class instructions {
             this.rt = rt;
             this.funct = "100000";
             this.shampt = "00000";
+            this.type = 'r';
         }
 
         public void printObj() {
@@ -88,7 +89,6 @@ public class instructions {
             System.out.print(this.rd + " ");
             System.out.print(this.shampt + " ");
             System.out.print(this.funct);
-            this.type = "r";
         }
     }
 
@@ -104,7 +104,7 @@ public class instructions {
             this.rt = rt;
             this.sa = sa;
             this.funct = "000000";
-            this.type = "r";
+            this.type = 'r';
         }
 
         public void printObj() {
@@ -130,7 +130,7 @@ public class instructions {
             this.rt = rt;
             this.funct = "100010";
             this.shampt = "00000";
-            this.type = "r";
+            this.type = 'r';
         }
 
         public void printObj() {
@@ -156,7 +156,7 @@ public class instructions {
             this.rt = rt;
             this.funct = "101010";
             this.shampt = "00000";
-            this.type = "r";
+            this.type = 'r';
         }
 
         public void printObj() {
@@ -178,7 +178,7 @@ public class instructions {
             this.opcode = "000000";
             this.rs = rs;
             this.funct = "001000";
-            this.type = "r";
+            this.type = 'r';
         }
 
         public void printObj() {
@@ -199,7 +199,7 @@ public class instructions {
             this.rs = rs;
             this.rt = rt;
             this.imm = imm;
-            this.type = "i";
+            this.type = 'i';
         }
 
         public void printObj() {
@@ -221,7 +221,7 @@ public class instructions {
             this.rs = rs;
             this.rt = rt;
             this.offset = offset;
-            this.type = "i";
+            this.type = 'i';
         }
 
         public void printObj() {
@@ -243,7 +243,7 @@ public class instructions {
             this.rs = rs;
             this.rt = rt;
             this.offset = offset;
-            this.type = "i";
+            this.type = 'i';
         }
 
         public void printObj() {
@@ -265,7 +265,7 @@ public class instructions {
             this.rs = rs;
             this.rt = rt;
             this.offset = offset;
-            this.type = "i";
+            this.type = 'i';
         }
 
         public void printObj() {
@@ -288,7 +288,7 @@ public class instructions {
             this.rs = rs;
             this.rt = rt;
             this.offset = offset;
-            this.type = "i";
+            this.type = 'i';
         }
 
         public void printObj() {
@@ -307,7 +307,7 @@ public class instructions {
             super();
             this.opcode = "000010";
             this.target = target;
-            this.type = "j";
+            this.type = 'j';
         }
 
         public void printObj() {
@@ -324,7 +324,7 @@ public class instructions {
             super();
             this.opcode = "000011";
             this.target = target;
-            this.type = "j";
+            this.type = 'j';
         }
         public void printObj() {
             System.out.print(this.opcode + " ");

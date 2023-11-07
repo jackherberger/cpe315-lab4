@@ -33,7 +33,6 @@ public class lab4 extends instructions {
         }
     }
 
-    
     public static void spim(ArrayList<Object> write, Hashtable<String, String> reg_codes, Hashtable<String, String> label_addresses) {
         int[] registers = new int[32];
         int[] data_memory = new int[8192];
@@ -47,19 +46,110 @@ public class lab4 extends instructions {
         }
         Scanner scanner = new Scanner(System.in);
 
-        final int[] pc = {0};
+        final int[] pc = {0, 0}; // 0 is regular pc, 1 is for where to jump to with branch
         final int[] cycles = {0};
-
+        final int[] lw_flag = {0, 0}; // 0 is if there was a lw last iteration, 1 is is squash needs to be printed due to conditions
+        final int[] b_flag = {0, 0}; // 0 is set to 3 for 3 rounds before squash, 1 is for if last three need to turn to squash
+        final int[] j_flag = {0};
 
         Runnable runnable = new Runnable() {
             public void run() {
-                Object curr = write.get(pc[0]);
-                pipeline.add(0, curr.getClass().toString().substring(19).toLowerCase());
-                pipeline.remove(pipeline.size()-1); 
+
                 cycles[0] += 1;  
-                System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
-                System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0], pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
-                             
+                Object curr = write.get(pc[0]);    
+                System.out.println();
+
+                if (b_flag[1] > 0) {
+                    pipeline.remove(0);
+                    pipeline.remove(0);
+                    pipeline.remove(0);
+                    pipeline.add(0, "squash");
+                    pipeline.add(0, "squash");
+                    pipeline.add(0, "squash");
+                    pc[0] = pc[1];
+                    curr = write.get(pc[0]);
+                    b_flag[1] -= 1;
+                    System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
+                    System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0], pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    return;
+                } else if (lw_flag[1] > 0) {
+                    lw_flag[1] -= 1;
+                    pipeline.add(1, "stall");
+                    System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
+                    System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0], pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    pipeline.remove(pipeline.size()-1); 
+                    return;
+                } else if (j_flag[0] > 0) {
+                    pipeline.add(0, "squash");
+                    System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
+                    System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0], pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    pipeline.remove(pipeline.size()-1); 
+                    j_flag[0] -= 1;
+                    return;
+                } /* else if (b_flag[1] > 0) {
+                    pipeline.remove(0);
+                    pipeline.remove(0);
+                    pipeline.remove(0);
+                    pipeline.add(0, "squash");
+                    pipeline.add(0, "squash");
+                    pipeline.add(0, "squash");
+                    pc[0] = pc[1];
+                    curr = write.get(pc[0]);
+                    b_flag[1] -= 1;
+                    System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
+                    System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0], pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    return;
+                } */ else {
+                    pipeline.add(0, curr.getClass().toString().substring(19).toLowerCase());
+                    System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
+                    System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0], pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    pipeline.remove(pipeline.size()-1); 
+                }
+
+                if (lw_flag[0] > 0) {
+                    lw_flag[0] -= 1;
+                    instruction current = (instruction) curr;
+                    Lw obj = (Lw) write.get(pc[0]-1);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+
+                    if (current.type == 'r') {
+                        if (current.rs != null) {
+                            int next_rs = Integer.parseInt(current.rs, 2);
+                            if (rs == next_rs) {
+                                lw_flag[1] += 1; 
+                            }
+                        }
+                        if (current.rt != null) {
+                            int next_rt = Integer.parseInt(current.rt, 2);
+                            if (rs == next_rt) {
+                                lw_flag[1] += 1; 
+                            }
+                        }
+                    }
+                    if (current.type == 'i') {
+                        if (current.rs != null) {
+                            int next_rs = Integer.parseInt(current.rs, 2);
+                            if (rs == next_rs) {
+                                lw_flag[1] += 1; 
+                            }
+                        }
+                    }
+                    if (curr.getClass().equals(instructions.Jal.class)){
+                        if (rs == 0b11111) {
+                            lw_flag[0] += 1; 
+                        }
+                    }
+                    int offset = Integer.parseInt(obj.offset, 2);
+                    registers[rt] = data_memory[registers[rs]+offset];
+                } /*else if (b_flag[0] > 0) {
+                    if (b_flag[0] > 1) {
+                        b_flag[0] -= 1;
+                    } else {
+                        b_flag[0] = 0;
+                        b_flag[1] = 1;
+                    }
+                }*/
 
                 if (curr.getClass().equals(instructions.And.class)){
                     And obj = (And) curr;
@@ -111,16 +201,15 @@ public class lab4 extends instructions {
                     Jr obj = (Jr) curr;
                     int rs = Integer.parseInt(obj.rs, 2);
                     pc[0] = registers[rs];
+                    j_flag[0] += 1;
                 }
                 else if (curr.getClass().equals(instructions.Addi.class)){
                     Addi obj = (Addi) curr;
                     int rs = Integer.parseInt(obj.rs, 2);
                     int rt = Integer.parseInt(obj.rt, 2);
                     int imm = Integer.parseInt(obj.imm, 2);
-                    byte b_offset = (byte)((int)imm);
+                    byte b_offset = (byte)((int) imm);
                     registers[rt] = registers[rs] + b_offset;
-                
-                
                 }
                 else if (curr.getClass().equals(instructions.Beq.class)){
                     Beq obj = (Beq) curr;
@@ -129,7 +218,9 @@ public class lab4 extends instructions {
                     int offset = Integer.parseInt(obj.offset, 2);
                     byte b_offset = (byte)((int)offset);
                     if (registers[rs] == registers[rt]){
-                        pc[0] += b_offset;
+                        b_flag[0] = 3;
+                        //pc[1] = pc[0] + b_offset; // pc keeps going down always so we can always get next three inst
+                        pc[0] += offset;
                     }
                 }
                 else if (curr.getClass().equals(instructions.Bne.class)){
@@ -139,7 +230,9 @@ public class lab4 extends instructions {
                     int offset = Integer.parseInt(obj.offset, 2);
                     byte b_offset = (byte)((int)offset);
                     if (registers[rs] != registers[rt]){
-                        pc[0] += b_offset;
+                        b_flag[0] = 4;
+                        //pc[1] = pc[0] + b_offset;
+                        pc[0] += offset;
                     }
                 }
                 else if (curr.getClass().equals(instructions.Lw.class)){
@@ -148,6 +241,7 @@ public class lab4 extends instructions {
                     int rt = Integer.parseInt(obj.rt, 2);
                     int offset = Integer.parseInt(obj.offset, 2);
                     registers[rt] = data_memory[registers[rs]+offset];
+                    lw_flag[0] += 1;
                 }
                 else if (curr.getClass().equals(instructions.Sw.class)){
                     Sw obj = (Sw) curr;
@@ -159,11 +253,13 @@ public class lab4 extends instructions {
                 else if (curr.getClass().equals(instructions.J.class)){
                     J obj = (J)curr;
                     pc[0] = Integer.parseInt(obj.target, 2) - 1;
+                    j_flag[0] += 1;
                 }
                 else if (curr.getClass().equals(instructions.Jal.class)){
                     Jal obj = (Jal)curr;
                     registers[31] = pc[0];
                     pc[0] = Integer.parseInt(obj.target, 2) - 1;
+                    j_flag[0] += 1;
                 }
                 pc[0]++;
             }
@@ -205,7 +301,6 @@ public class lab4 extends instructions {
                     }
                 }
                 else {
-                    System.out.println("1 instruction(s) executed");
                     if (pc[0] < write.size()){
                         runnable.run();
                     }
@@ -259,6 +354,7 @@ public class lab4 extends instructions {
                 registers[25], registers[29], ra);
             }
         }
+        scanner.close();
     }
 
     public static void spimScript(ArrayList<Object> write, Hashtable<String, String> reg_codes, Hashtable<String, String> label_addresses,ArrayList<String> scriptLines) {
