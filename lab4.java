@@ -52,21 +52,26 @@ public class lab4 extends instructions {
         final int[] b_flag = {0, 0}; // 0 is set to 3 for 3 rounds before squash, 1 is for if last three need to turn to squash
         final int[] j_flag = {0}; // 0 is for the flag,
         final int[] instr_count = {0}; // Seperate variable to count instructions
+        final int[] print_flag = {0}; // Print flag
 
         Runnable runnable = new Runnable() {
             public void run() {
 
                 cycles[0] += 1;  
-                Object curr = write.get(pc[0]);    
-                System.out.println();
+                Object curr = write.get(pc[0]);  
+                if (print_flag[0] == 0){
+                    System.out.println();
+                }  
 
                 if (b_flag[0] > 1) {
                     cycles[0] += 1;
                     b_flag[0] -= 1;
                     int pc_offset = -(b_flag[0]) + 3;
                     pipeline.add(0, curr.getClass().toString().substring(19).toLowerCase());
-                    System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
-                    System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0] + pc_offset, pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    if (print_flag[0] == 0){
+                        System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
+                        System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0] + pc_offset, pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    }
                     pipeline.remove(pipeline.size()-1); 
                     return;
                 } 
@@ -77,8 +82,10 @@ public class lab4 extends instructions {
                     pipeline.add(0, "squash");
                     pipeline.add(0, "squash");
                     pipeline.add(0, "squash");
-                    System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
-                    System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0] + 3, pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    if (print_flag[0] == 0){
+                        System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
+                        System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0] + 3, pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    }        
                     pc[0] = pc[1] + 1;
                     curr = write.get(pc[0]);
                     b_flag[0] -= 1;
@@ -88,31 +95,38 @@ public class lab4 extends instructions {
                     return;
                 }
                 else if (lw_flag[1] > 0) {
-                    // cycles[0] += 1;
+                    // cycles[0] -= 1;
                     lw_flag[1] -= 1;
                     pipeline.add(1, "stall");
-                    System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
-                    System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0], pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    if (print_flag[0] == 0) {
+                        System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
+                        System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0], pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    }
                     pipeline.remove(pipeline.size()-1); 
                     return;
                 } else if (j_flag[0] > 0) {
                     cycles[0] += 1;
                     pipeline.add(0, "squash");
-                    System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
-                    System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0], pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    if (print_flag[0] == 0) {
+                        System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
+                        System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0], pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    }
                     pipeline.remove(pipeline.size()-1); 
                     j_flag[0] -= 1;
                     return;
                 } else {
                     instr_count[0] += 1;
                     pipeline.add(0, curr.getClass().toString().substring(19).toLowerCase());
-                    System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
-                    System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0] + 1, pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    if (print_flag[0] == 0){
+                        System.out.format("%2s %10s %10s %10s %10s\n", "pc", "if/id", "id/exe", "exe/mem", "mem/wb");
+                        System.out.format("%2d %10s %10s %10s %10s\n\n", pc[0] + 1, pipeline.get(0), pipeline.get(1), pipeline.get(2), pipeline.get(3));
+                    }
                     pipeline.remove(pipeline.size()-1); 
                 }
 
                 if (lw_flag[0] > 0) {
                     lw_flag[0] -= 1;
+                    // cycles[0] += 1;
                     instruction current = (instruction) curr;
                     Lw obj = (Lw) write.get(pc[0]-1);
                     int rs = Integer.parseInt(obj.rs, 2);
@@ -305,17 +319,18 @@ public class lab4 extends instructions {
                     }
                 }
                 else {
-                    if (pc[0] < write.size()){
+                    if (pc[0] < write.size()){  
                         runnable.run();
                     }
                 }
             }
 
             else if (input.charAt(0) == 'r') {
+                print_flag[0] = 1;
                 while (pc[0] < write.size()) {
                     runnable.run();
                 }
-                System.out.println("Program complete");
+                System.out.println("\nProgram complete");
                 System.out.format("CPI = %.3f     Cycles = %d      Instructions = %d\n", (double) cycles[0] / instr_count[0], cycles[0], instr_count[0]);
                 break;
             }
