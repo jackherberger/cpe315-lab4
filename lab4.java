@@ -134,13 +134,13 @@ public class lab4 extends instructions {
                     if (current.type == 'r') {
                         if (current.rs != null) {
                             int next_rs = Integer.parseInt(current.rs, 2);
-                            if (rs == next_rs) {
+                            if (rt == next_rs) {
                                 lw_flag[1] += 1; 
                             }
                         }
                         if (current.rt != null) {
                             int next_rt = Integer.parseInt(current.rt, 2);
-                            if (rs == next_rt) {
+                            if (rt == next_rt) {
                                 lw_flag[1] += 1; 
                             }
                         }
@@ -154,7 +154,7 @@ public class lab4 extends instructions {
                         }
                     }
                     if (curr.getClass().equals(instructions.Jal.class)){
-                        if (rs == 0b11111) {
+                        if (rt == 0b11111) {
                             cycles[0] += 1;
 
                             lw_flag[0] += 1; 
@@ -478,14 +478,14 @@ public class lab4 extends instructions {
                     if (current.type == 'r') {
                         if (current.rs != null) {
                             int next_rs = Integer.parseInt(current.rs, 2);
-                            if (rs == next_rs) {
+                            if (rt == next_rs) {
                                 lw_flag[1] += 1; 
 
                             }
                         }
                         if (current.rt != null) {
                             int next_rt = Integer.parseInt(current.rt, 2);
-                            if (rs == next_rt) {
+                            if (rt == next_rt) {
                                 lw_flag[1] += 1; 
 
                             }
@@ -500,7 +500,7 @@ public class lab4 extends instructions {
                         }
                     }
                     if (curr.getClass().equals(instructions.Jal.class)){
-                        if (rs == 0b11111) {
+                        if (rt == 0b11111) {
                             lw_flag[0] += 1; 
                         }
                     }
@@ -557,6 +557,9 @@ public class lab4 extends instructions {
                 else if (curr.getClass().equals(instructions.Jr.class)){
                     Jr obj = (Jr) curr;
                     int rs = Integer.parseInt(obj.rs, 2);
+                    // if (pc[0] == registers[rs]) {
+                    //     cycles[0] -= 1;
+                    // }
                     pc[0] = registers[rs];
                     j_flag[0] += 1;
                 }
@@ -613,12 +616,18 @@ public class lab4 extends instructions {
                 }
                 else if (curr.getClass().equals(instructions.J.class)){
                     J obj = (J)curr;
+                    // if (pc[0] == Integer.parseInt(obj.target, 2)) {
+                    //     cycles[0] -= 1;
+                    // }
                     pc[0] = Integer.parseInt(obj.target, 2) - 1;
                     j_flag[0] += 1;
                 }
                 else if (curr.getClass().equals(instructions.Jal.class)){
                     Jal obj = (Jal)curr;
                     registers[31] = pc[0];
+                    // if (pc[0] == Integer.parseInt(obj.target, 2)) {
+                    //     cycles[0] -= 1;
+                    // }
                     pc[0] = Integer.parseInt(obj.target, 2) - 1;
                     j_flag[0] += 1;
                 }
